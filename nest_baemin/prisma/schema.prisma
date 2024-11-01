@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model categories {
+  name        String  @unique @db.VarChar(50)
+  description String?
+  category_id Int     @id @default(autoincrement())
+}
+
+model delivery_details {
+  delivery_id             Int       @id @default(autoincrement())
+  order_id                Int?
+  driver_id               Int?
+  status                  String?   @db.VarChar(20)
+  pickup_address          String?
+  delivery_address        String?
+  estimated_delivery_time DateTime? @db.Timestamptz(6)
+  actual_delivery_time    DateTime? @db.Timestamptz(6)
+  created_at              DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model menu_item_categories {
+  menu_item_id Int
+  category_id  Int
+
+  @@id([menu_item_id, category_id])
+}
+
+model menu_items {
+  item_id     Int       @id @default(autoincrement())
+  menu_id     Int?
+  name        String    @db.VarChar(100)
+  description String?
+  price       Decimal   @db.Decimal(10, 2)
+  image_url   String?   @db.VarChar(255)
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model menus {
+  name          String    @db.VarChar(100)
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  menu_id       Int       @id @default(autoincrement())
+  restaurant_id Int?
+}
+
+model order_items {
+  order_item_id Int     @id @default(autoincrement())
+  order_id      Int?
+  item_id       Int?
+  quantity      Int
+  price         Decimal @db.Decimal(10, 2)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model orders {
+  status        String    @db.VarChar(20)
+  total_price   Decimal?  @db.Decimal(10, 2)
+  delivery_fee  Decimal?  @db.Decimal(10, 2)
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  order_id      Int       @id @default(autoincrement())
+  customer_id   Int?
+  restaurant_id Int?
+  driver_id     Int?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model payments {
+  amount     Decimal   @db.Decimal(10, 2)
+  method     String    @db.VarChar(20)
+  status     String    @db.VarChar(20)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  payment_id Int       @id @default(autoincrement())
+  order_id   Int?
+}
+
+model restaurants {
+  name          String    @db.VarChar(100)
+  description   String?
+  location      String?
+  phone         String?   @db.VarChar(15)
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  restaurant_id Int       @id @default(autoincrement())
+  owner_id      Int
+  open_time     String?   @db.VarChar(5)
+  close_time    String?   @db.VarChar(5)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model reviews {
+  rating        Int?
+  comment       String?
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  review_id     Int       @id @default(autoincrement())
+  restaurant_id Int?
+  user_id       Int?
+}
+
+model users {
+  name       String    @db.VarChar(100)
+  email      String    @unique @db.VarChar(255)
+  password   String    @db.VarChar(255)
+  phone      String?   @db.VarChar(15)
+  address    String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  user_id    Int       @id @default(autoincrement())
+  role       Role
+}
+
+enum DeliveryStatus {
+  assigned
+  picked_up
+  on_the_way
+  delivered
+}
+
+enum OrderStatus {
+  pending
+  accepted
+  preparing
+  delivering
+  completed
+  cancelled
+}
+
+enum PaymentMethod {
+  credit_card
+  debit_card
+  paypal
+  cash_on_delivery
+}
+
+enum PaymentStatus {
+  paid
+  pending
+  failed
+}
+
+enum Role {
+  customer
+  restaurant_owner
+  driver
+}
