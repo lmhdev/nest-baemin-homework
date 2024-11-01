@@ -14,8 +14,26 @@ export class RestaurantsService {
     return this.prisma.restaurants.create({ data });
   }
 
-  async getAllRestaurants(): Promise<Restaurant[]> {
-    return this.prisma.restaurants.findMany();
+  async getAllRestaurants(page: number = 1, limit: number = 10) {
+    const offset = (page - 1) * limit;
+
+    const restaurants = await this.prisma.restaurants.findMany({
+      skip: offset,
+      take: Number(limit),
+    });
+
+    const total = await this.prisma.restaurants.count();
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: restaurants,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total: Number(total),
+        totalPages,
+      },
+    };
   }
 
   async getRestaurantById(id: number): Promise<Restaurant> {

@@ -3,7 +3,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { menu_items as MenuItems } from '@prisma/client';
 
 @Injectable()
-export class MenuItemService {
+export class MenuItemsService {
   constructor(private prisma: PrismaService) {}
 
   async createMenuItem(data: {
@@ -16,8 +16,36 @@ export class MenuItemService {
     return this.prisma.menu_items.create({ data });
   }
 
-  async getAllMenuItems(): Promise<MenuItems[]> {
-    return this.prisma.menu_items.findMany();
+  async getAllMenuItems(page: number = 1, limit: number = 10, search?: string) {
+    const offset = (page - 1) * limit;
+    const menuItems = await this.prisma.menu_items.findMany({
+      where: {
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+      skip: offset,
+      take: Number(limit),
+    });
+    const total = await this.prisma.menu_items.count({
+      where: {
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+    });
+    const totalPages = Math.ceil(total / limit);
+    return {
+      data: menuItems,
+      pagination: {
+        page,
+        limit: Number(limit),
+        total: Number(total),
+        totalPages,
+      },
+    };
   }
 
   async getMenuItemById(id: number): Promise<MenuItems> {

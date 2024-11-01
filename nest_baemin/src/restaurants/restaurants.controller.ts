@@ -6,29 +6,33 @@ import {
   Delete,
   Body,
   Param,
+  Query,
 } from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service';
 import { restaurants as Restaurant } from '@prisma/client';
 
 @Controller('restaurants')
 export class RestaurantsController {
-  constructor(private readonly restaurantService: RestaurantsService) {}
+  constructor(private readonly restaurantsService: RestaurantsService) {}
 
   @Post()
   async createRestaurant(
     @Body() data: { name: string; address: string; owner_id: number },
   ): Promise<Restaurant> {
-    return this.restaurantService.createRestaurant(data);
+    return this.restaurantsService.createRestaurant(data);
   }
 
   @Get()
-  async getAllRestaurants(): Promise<Restaurant[]> {
-    return this.restaurantService.getAllRestaurants();
+  async getAllRestaurants(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.restaurantsService.getAllRestaurants(page, limit);
   }
 
   @Get(':id')
   async getRestaurantById(@Param('id') id: number): Promise<Restaurant> {
-    return this.restaurantService.getRestaurantById(id);
+    return this.restaurantsService.getRestaurantById(id);
   }
 
   @Put(':id')
@@ -36,11 +40,11 @@ export class RestaurantsController {
     @Param('id') id: number,
     @Body() data: Partial<Restaurant>,
   ): Promise<Restaurant> {
-    return this.restaurantService.updateRestaurant(id, data);
+    return this.restaurantsService.updateRestaurant(id, data);
   }
 
   @Delete(':id')
   async deleteRestaurant(@Param('id') id: number): Promise<Restaurant> {
-    return this.restaurantService.deleteRestaurant(id);
+    return this.restaurantsService.deleteRestaurant(id);
   }
 }
