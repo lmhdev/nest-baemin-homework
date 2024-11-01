@@ -13,17 +13,21 @@ const CartContext = createContext<CartContextType | null>(null);
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [cartItems, setCartItems] = useState<ICartItem[]>(() => {
-    const storedCart = localStorage.getItem("cart");
-    return storedCart ? JSON.parse(storedCart) : [];
-  });
+  const [cartItems, setCartItems] = useState<ICartItem[]>([]);
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-  }, [cartItems]);
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
+  }, []);
 
   const addToCart = (item: ICartItem) => {
-    setCartItems((prevItems) => [...prevItems, item]);
+    setCartItems((prevItems) => {
+      const updatedItems = [...prevItems, item];
+      localStorage.setItem("cart", JSON.stringify(updatedItems));
+      return updatedItems;
+    });
   };
 
   const clearCart = () => {
