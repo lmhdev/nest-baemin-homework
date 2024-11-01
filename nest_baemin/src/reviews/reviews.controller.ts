@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { reviews as Reviews } from '@prisma/client';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -28,11 +29,13 @@ export class ReviewsController {
     return this.reviewsService.createReview(data);
   }
 
+  @Public()
   @Get()
   async getAllReviews(): Promise<Reviews[]> {
     return this.reviewsService.getAllReviews();
   }
 
+  @Public()
   @Get(':id')
   async getReviewById(@Param('id', ParseIntPipe) id: number): Promise<Reviews> {
     return this.reviewsService.getReviewById(id);

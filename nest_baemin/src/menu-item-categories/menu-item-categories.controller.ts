@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { MenuItemCategoriesService } from './menu-item-categories.service';
 import { menu_item_categories as MenuItemCategories } from '@prisma/client';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('menuitemcategories')
 export class MenuItemCategoriesController {
@@ -23,11 +24,13 @@ export class MenuItemCategoriesController {
     return this.menuItemCategoryService.addMenuItemCategory(data);
   }
 
+  @Public()
   @Get()
   async getAllMenuItemCategories(): Promise<MenuItemCategories[]> {
     return this.menuItemCategoryService.getAllMenuItemCategories();
   }
 
+  @Public()
   @Get(':menu_item_id/:category_id')
   async getMenuItemCategory(
     @Param('menu_item_id', ParseIntPipe) menu_item_id: number,

@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service';
 import { restaurants as Restaurant } from '@prisma/client';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('restaurants')
 export class RestaurantsController {
@@ -22,6 +23,7 @@ export class RestaurantsController {
     return this.restaurantsService.createRestaurant(data);
   }
 
+  @Public()
   @Get()
   async getAllRestaurants(
     @Query('page') page: number = 1,
@@ -30,6 +32,7 @@ export class RestaurantsController {
     return this.restaurantsService.getAllRestaurants(page, limit);
   }
 
+  @Public()
   @Get(':id')
   async getRestaurantById(@Param('id') id: number): Promise<Restaurant> {
     return this.restaurantsService.getRestaurantById(id);

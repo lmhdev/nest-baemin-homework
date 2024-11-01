@@ -8,9 +8,11 @@ import {
   Param,
   ParseIntPipe,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { MenuItemsService } from './menu-items.service';
 import { menu_items as MenuItems } from '@prisma/client';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('menu-items')
 export class MenuItemsController {
@@ -30,6 +32,7 @@ export class MenuItemsController {
     return this.menuItemService.createMenuItem(data);
   }
 
+  @Public()
   @Get()
   async getAllMenuItems(
     @Query('page') page: number = 1,
@@ -39,11 +42,22 @@ export class MenuItemsController {
     return this.menuItemService.getAllMenuItems(page, limit, search);
   }
 
+  @Public()
   @Get(':id')
   async getMenuItemById(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<MenuItems> {
     return this.menuItemService.getMenuItemById(id);
+  }
+
+  @Public()
+  @Get('menu/:id')
+  async getMenuItemsByMenuId(@Param('id') id: string): Promise<MenuItems[]> {
+    const menuId = parseInt(id, 10);
+    if (isNaN(menuId)) {
+      throw new NotFoundException(`Invalid menu ID: ${id}`);
+    }
+    return await this.menuItemService.getMenuItemsByMenuId(menuId);
   }
 
   @Put(':id')

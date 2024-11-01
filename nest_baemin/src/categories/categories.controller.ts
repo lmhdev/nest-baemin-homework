@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { categories as Categories } from '@prisma/client';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('categories')
 export class CategoriesController {
@@ -22,11 +23,13 @@ export class CategoriesController {
     return this.categoryService.createCategory(data);
   }
 
+  @Public()
   @Get()
   async getAllCategories(): Promise<Categories[]> {
     return this.categoryService.getAllCategories();
   }
 
+  @Public()
   @Get(':id')
   async getCategoryById(
     @Param('id', ParseIntPipe) id: number,

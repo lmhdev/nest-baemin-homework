@@ -58,6 +58,20 @@ export class MenuItemsService {
     return menuItem;
   }
 
+  async getMenuItemsByMenuId(menuId: number): Promise<MenuItems[]> {
+    const menuItems = await this.prisma.menu_items.findMany({
+      where: {
+        menu_id: Number(menuId),
+      },
+    });
+
+    if (!menuItems.length) {
+      throw new NotFoundException(`No menu items found for menu ID ${menuId}`);
+    }
+
+    return menuItems;
+  }
+
   async updateMenuItem(
     id: number,
     data: Partial<MenuItems>,
