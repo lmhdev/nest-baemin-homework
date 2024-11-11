@@ -53,7 +53,14 @@ This repository contains two applications: a NestJS backend (`nest_baemin`) and 
    npx prisma generate
    ```
 
-7. **Start the Server**:
+7. **Configure JWT Environment Variables**::
+
+   - Open `.env` and fill in the JWT secret:
+     ```env
+     JWT_SECRET="651898e3a62aa7c71973a772ab1d1c5e8f6fb8ef83cc0820888ce58c24defcd9"
+     ```
+
+8. **Start the Server**:
    ```bash
    yarn start:dev
    ```
